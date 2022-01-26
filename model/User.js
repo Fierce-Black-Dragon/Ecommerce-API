@@ -1,7 +1,10 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
-var jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
+const crypto = require("crypto");
+
+
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -17,7 +20,8 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, 'Please enter the password'],
-        minlength:[6, 'Please enter password greater than or equal to 6 char'], 
+        minlength: [6, 'Please enter password greater than or equal to 6 char'], 
+        select:false
     },
     role: {
         type: String,
@@ -32,12 +36,11 @@ const userSchema = new mongoose.Schema({
             type: String,
         }
     },
-    forgotPasswordToken: {
-        type: String,
-
-    },
-    forgotPasswordTokenExpiry: {
-        
+     forgotPasswordToken:  String,
+     forgotTokenExpiry: Date,
+    createdAt: {
+        type: Date,
+        default: Date.now,
     }
 // more fields will be added when required
 
@@ -65,5 +68,16 @@ userSchema.methods.isPasswordValid =  async function (senderPassword) {
 // jwt  creation 
 userSchema.methods.jwtTokenCreation = async function () {
     return await jwt.sign({id: this._id},process.env.JWT_SECRET_KEY,{expiresIn: process.env.JWT_EXPIRE})
+}
+
+// forgot password token creation
+userSchema.methods.getForgotPasswordToken = async function () {
+ //forgot password token creation -(type - String)
+    const forgotToken = await crypto.randomBytes(20).toString('hex'); // dont know how much time will  take
+
+    // save hash version of the token in the database  and send the forgot password token  to user
+    this.forgotPasswordToken = await crypto.createHash('sha256').update(forgotToken).digest('hex');
+    this.forgotTokenExpiry = date.now() + 20 * 60 * 1000;
+    return forgotToken;
 }
 module.exports = mongoose.model('User',userSchema)

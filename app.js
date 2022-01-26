@@ -2,11 +2,15 @@ const express = require('express');
 require('dotenv').config();
 
 const app = express();
-const home= require('./routes/home')
-//app routes middle ware
+const home = require('./routes/home')
+const user = require('./routes/user')
 
-app.use('/api/v1', home);
-
+//regular middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+//router middleware
+app.use("/api/v1", home);
+app.use("/api/v1", user)
 
 
 
