@@ -1,9 +1,15 @@
+require('dotenv').config()
 const express = require('express');
-require('dotenv').config();
+//database connection
+require('./config/database').connect()
+
 
 const app = express();
 const home = require('./routes/home')
 const user = require('./routes/user')
+
+
+
 
 //regular middleware
 app.use(express.json());
