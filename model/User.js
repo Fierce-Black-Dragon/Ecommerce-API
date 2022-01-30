@@ -28,13 +28,9 @@ const userSchema = new mongoose.Schema({
         default: 'user'
     },
     profilePhoto: {
-        id: {
-            type: String,
-           
-        },
-        secured_Url: {
-            type: String,
-        }
+        id: String,
+        secured_Url:  String,
+        
     },
      forgotPasswordToken:  String,
      forgotTokenExpiry: Date,
