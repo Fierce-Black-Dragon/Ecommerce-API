@@ -1,0 +1,219 @@
+# openapi: 3.0.0
+# info:
+#   title: test Api with docs
+#   description: Producing a basic api and  learning how to write docs using swagger open api 3.0.0
+#   version: 1.0.0
+#   contact:
+#     email: vishnukulkarni4302@gmail.com
+#     url: "https://github.com/Fierce-Black-Dragon"
+
+# servers:
+#   - url: "{protocol}://localhost:5001/api/{version}"
+#     description: for local host 
+#     variables:
+#       version:
+#         enum:
+#           - v1
+#           - v2
+#         default: v1
+#       protocol:
+#         enum:
+#           - http
+#         default: http
+
+# components:
+#   securitySchemes:
+#     cookieAuth:
+#       type: apiKey
+#       in: cookie
+#       name: token
+#     BearerAuth:
+#       type: http
+#       scheme: bearer
+
+# paths:
+#   /greet:
+#     get:
+#       summary: greets the  user.
+#       description:
+#       responses:
+#         '200':    # status code
+#           description: A string 
+#           content:
+#             application/json:
+#               schema: 
+#                 type: string
+#   /obj:
+#     get:
+#       summary: give a  obj 
+#       description:
+#       responses:
+#         '200':    # status code
+#           description: A object 
+#           content:
+#             application/json:
+#               schema: 
+#                 type: object
+#                 properties:
+#                   id:
+#                     type: string
+#                   name: 
+#                     type: string
+#                   price:
+#                     type: number
+#                   rating:
+#                     type: number
+#   /courses:
+#     get:
+#       tags:
+#         - courses
+#       summary: give  a list of courses
+#       description:
+#       responses:
+#         '200':    # status code
+#           description: A object 
+#           content:
+#             application/json:
+#               schema: 
+#                 type: array
+#                 items:
+#                     type: object
+#                     properties:
+#                       id:
+#                         type: string
+#                       name: 
+#                         type: string
+#                       price:
+#                         type: number
+#                       rating:
+#                         type: number
+#     post:
+#         tags:
+#           - courses
+#         summary: adds a new course to existing courses
+#         consumes:
+#           - application/json
+#         produces:
+#           - application/json
+#         requestBody:
+#           required: true
+#           content:
+#             application/json:
+#               schema:
+#                 type: object
+#                 properties:
+#                   id:
+#                     type: string
+#                   name:
+#                     type: string
+#                   price:
+#                     type: number
+#         responses:
+#           200:
+#             description: All good success
+#             content:
+#               application/json:
+#                 schema:
+#                   type: boolean
+                                    
+   
+#   /courses/{id}:
+#     get:
+#       tags:
+#           - courses
+#       summary: give  a course details
+#       parameters:
+#         - name: id
+#           in: path
+#           required: true
+#           default: r1
+#           schema:
+#             type: string
+
+        
+#       responses:
+#         '200':    # status code
+#           description: A object 
+#           content:
+#             application/json:
+#               schema: 
+#                   type: object
+#                   properties:
+#                       id:
+#                         type: string
+#                       name: 
+#                         type: string
+#                       price:
+#                         type: number
+#                       rating:
+#                         type: number
+  
+#   /courseQuery:
+#      get:
+#       tags:
+#           - query
+#       summary: give  a course details
+#       parameters:
+#         - name: location
+#           in: query
+#           required: true
+        
+#           schema:
+#             type: string
+#             enum: [1,2,3]
+#         - name: device
+#           in: query
+#           required: true
+#           schema:
+#             type: string
+#             enum: [web,mob]
+              
+        
+#       responses:
+#         '200':    # status code
+#           description: A object 
+#           content:
+#             application/json:
+#               schema: 
+#                   type: object
+#                   properties:
+#                       location:
+#                         type: string
+#                       device: 
+#                         type: string
+ 
+#   /fileUpload:
+#     post:
+#       tags:
+#         - String
+#       summary: uploading course image
+#       parameters:
+#         - in: header
+#           name: auth
+#       requestBody:
+#         content:
+#           multipart/form-data:
+#             schema:
+#               type: object
+#               properties:
+#                 file:
+#                   type: string
+#                   format: binary
+      
+#       responses:
+#         '200':    # status code
+#           description: A string 
+#           content:
+#             application/json:
+#               schema: 
+#                   type: string
+                 
+                                          
+    
+
+
+  
+
+
+
+

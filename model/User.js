@@ -28,8 +28,14 @@ const userSchema = new mongoose.Schema({
         default: 'user'
     },
     profilePhoto: {
-        id: String,
-        secured_Url:  String,
+        id: {
+            type: String,
+            required: true
+        },
+        secured_Url:   {
+            type: String,
+            required: true
+        },
         
     },
      forgotPasswordToken:  String,
