@@ -1,36 +1,28 @@
-require('dotenv').config()
+require("dotenv").config();
 //git push -u origin main
-const express = require('express');
-const fileUpload = require('express-fileupload');
-const cors = require('cors')
-
-
+const express = require("express");
+const fileUpload = require("express-fileupload");
+const cors = require("cors");
 
 const app = express();
-const home = require('./routes/home')
-const user = require('./routes/user')
+const home = require("./routes/home");
+const user = require("./routes/user");
 
-
-//cors middleware 
-app.use(cors())
-
+//cors middleware
+app.use(cors());
 
 //regular middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(fileUpload({
-    useTempFiles : true,
-    tempFileDir : '/tmp/'
-}));
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+  })
+);
 //router middleware
 app.use("/api/v1", home);
-app.use("/api/v1", user)
-
-
-
-
-
-
+app.use("/api/v1", user);
 
 // export app
 module.exports = app;
