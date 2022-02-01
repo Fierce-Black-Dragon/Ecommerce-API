@@ -76,3 +76,21 @@ exports.Login = async (req, res) => {
     console.log(error);
   }
 };
+
+exports.logout = async (req, res) => {
+  try {
+    //making the cookie expiry  options
+    const options = {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+    };
+
+    //setting cookie to null when logout route is requested
+    res.status(200).cookie("auth_token", null, options).json({
+      success: true,
+      message: "logout success",
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
