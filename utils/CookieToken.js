@@ -9,8 +9,8 @@ const cookieToken = (user, res) => {
   //cookie creations
   res.status(200).cookie("auth_token", token, options).json({
     success: true,
-    email: user.email,
     userId: user._id,
+    email: user.email,
   });
 };
 module.exports = cookieToken;

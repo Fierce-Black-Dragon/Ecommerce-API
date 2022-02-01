@@ -12,11 +12,13 @@ exports.signup = async (req, res) => {
     }
     const file = req.files.profile;
     console.log(file);
-    responseImage = await cloudinary.uploader.upload(file.tempFilePath, {
-      folder: "users",
-      width: 150,
-      crop: "scale",
-    });
+    if (file.tempFilePath) {
+      responseImage = await cloudinary.uploader.upload(file.tempFilePath, {
+        folder: "users",
+        width: 150,
+        crop: "scale",
+      });
+    }
 
     //finding if any filed is pending
     if (!(name && email && password)) {
@@ -42,7 +44,6 @@ exports.signup = async (req, res) => {
     });
     //token creation function
     cookieToken(user, res);
-    console.log(user);
   } catch (error) {
     console.log(error);
   }
