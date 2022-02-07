@@ -115,9 +115,7 @@ exports.ForgotPassword = async (req, res) => {
     // saving the token in the database
     await user.save({ validateBeforeSave: false });
     //create a URL
-    const myUrl = `${req.protocol}://${req.get(
-      "host"
-    )}/api/v1/password/reset/:${forgotToken}`;
+    const myUrl = `http://localhost:3000/${user._id}/password/reset/${forgotToken}`;
 
     // craft a message
     const message = `Copy paste this link in your URL and hit enter \n\n ${myUrl}`;
@@ -142,6 +140,13 @@ exports.ForgotPassword = async (req, res) => {
       res.status(500).json({ errorMessage: error });
       console.error(error);
     }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+exports.reset = async (req, res) => {
+  try {
   } catch (error) {
     console.error(error);
   }
