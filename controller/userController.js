@@ -2,6 +2,7 @@ const UserModel = require("../model/User");
 const cookieToken = require("../utils/CookieToken");
 const cloudinary = require("cloudinary").v2;
 const mailHelper = require("../utils/NodeMailer");
+const crypto = require("crypto");
 exports.signup = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -145,8 +146,47 @@ exports.ForgotPassword = async (req, res) => {
   }
 };
 
-exports.reset = async (req, res) => {
+exports.resetPassword = async (req, res) => {
   try {
+    const { user_id, forgotToken } = req.params;
+
+    const { password, confirmPassword } = req.body;
+    if (!(password && confirmPassword)) {
+      res.status(400).send("all feilds are required");
+    }
+    const encryToken = crypto
+      .createHash("sha256")
+      .update(forgotToken)
+      .digest("hex");
+
+    // find user based on based on  token and time in future
+    const user = await UserModel.findOne({
+      encryToken,
+      forgotPasswordExpiry: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      res.status(400).send("Token is invalid or expired");
+    }
+
+    // check if password and conf password matched
+    if (password !== confirmPassword) {
+      res.status(400).send("password and confirm password do not match");
+    }
+
+    // update password field in DB
+    user.password = password;
+
+    // reset token fields
+    user.forgotPasswordToken = undefined;
+    user.forgotPasswordExpiry = undefined;
+
+    // save the user
+    await user.save();
+
+    // send a JSON response
+
+    res.status(200).json({ message: " reset successfully" });
   } catch (error) {
     console.error(error);
   }
