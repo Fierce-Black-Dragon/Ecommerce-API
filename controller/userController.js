@@ -3,17 +3,27 @@ const cookieToken = require("../utils/CookieToken");
 const cloudinary = require("cloudinary").v2;
 const mailHelper = require("../utils/NodeMailer");
 const crypto = require("crypto");
-exports.signup = async (req, res) => {
+const createError = require("http-errors");
+const {
+  authLSchema,
+  authRSchema,
+  resetPasswordSchema,
+  forgotSchema,
+} = require("../utils/schemaValidator");
+exports.signup = async (req, res, next) => {
   try {
-    const { name, email, password, role } = req.body;
+    //
     let responseImage;
+    //validate the  user input (checking if all fields are enter correctly)
+    const validateResult = await authRSchema.validateAsync(req.body);
+    const { name, email, password, role } = validateResult;
 
     // checking if file is send
     if (!req.files) {
-      res.status(400).json({ error: " profileImage is missing" });
+      throw createError.NotFound(" profileImage is missing");
     }
     const file = req.files.profile;
-    console.log(file);
+
     if (file.tempFilePath) {
       responseImage = await cloudinary.uploader.upload(file.tempFilePath, {
         folder: "users",
@@ -22,17 +32,10 @@ exports.signup = async (req, res) => {
       });
     }
 
-    //finding if any filed is pending
-    if (!(name && email && password)) {
-      res.status(404).json({
-        success: false,
-        error: "all fields are required",
-      });
-    }
     //finding if user is already register
     const existingUser = await UserModel.findOne({ email: email });
     if (existingUser) {
-      res.status(404).send({ error: "user already exists" });
+      throw createError.Conflict(`${result.email} is already been registered`);
     }
     //creating user in mongo db
     const user = await UserModel.create({
@@ -44,39 +47,47 @@ exports.signup = async (req, res) => {
         secured_Url: responseImage.secure_url,
       },
     });
-    //token creation function
-    cookieToken(user, res);
+    // send json response with register successfully
+    res.status(201).json({
+      success: true,
+      message: "Register successfully u can login now",
+    });
   } catch (error) {
-    console.log(error);
+    if (error.isJoi === true) {
+      error.status = 422;
+      error.message =
+        " all fields are required or invalid  fields values passed";
+    }
+    next(error);
   }
 };
 
-exports.Login = async (req, res) => {
+exports.Login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    //validate the  user input (checking if all fields are enter correctly)
+    const validateResult = await authLSchema.validateAsync(req.body);
+    const { email, password } = validateResult;
 
-    //finding if any filed is pending
-    if (!(email && password)) {
-      res.status(404).json({
-        error: "email or password is missing",
-      });
-    }
     //finding the user in database  using email
     const user = await UserModel.findOne({ email }).select("+password");
     //if user is not found
     if (!user) {
-      res.status(404).send({ error: "email or password incorrect" });
+      throw createError.NotFound("User not found");
     }
     // checking  if enter password is correct
     const isPAsswordCorrect = await user.isPasswordValid(password);
     if (!isPAsswordCorrect) {
-      res.status(404).send({ error: "email or password incorrect" });
+      throw createError.Unauthorized("email or password invalid");
     }
 
     //token creation function
     cookieToken(user, res);
   } catch (error) {
-    console.log(error);
+    if (error.isJoi === true) {
+      error.status = 400;
+      // error.message = "email or password invalid";
+    }
+    next(error);
   }
 };
 
@@ -161,7 +172,7 @@ exports.resetPassword = async (req, res) => {
 
     // find user based on based on  token and time in future
     const user = await UserModel.findOne({
-      encryToken,
+      forgotPasswordToken: encryToken,
       forgotPasswordExpiry: { $gt: Date.now() },
     });
 

@@ -3,7 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
-
+var morgan = require("morgan");
 const app = express();
 const home = require("./routes/home");
 const user = require("./routes/user");
@@ -11,6 +11,8 @@ const user = require("./routes/user");
 //cors middleware
 app.use(cors());
 
+//morgan
+app.use(morgan("dev"));
 //for swagger documentation
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");

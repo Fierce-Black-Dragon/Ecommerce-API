@@ -71,13 +71,15 @@ userSchema.methods.jwtTokenCreation = async function () {
 userSchema.methods.getForgotPasswordToken = async function () {
   //forgot password token creation -(type - String)
   const forgotToken = await crypto.randomBytes(20).toString("hex"); // dont know how much time will  take
-
+  //expire
+  this.forgotPasswordExpiry = Date.now() + 20 * 60 * 1000;
+ 
   // save hash version of the token in the database  and send the forgot password token  to user
   this.forgotPasswordToken = await crypto
     .createHash("sha256")
     .update(forgotToken)
     .digest("hex");
-  this.forgotPasswordExpiry = Date.now() + 20 * 60 * 1000;
+
   return forgotToken;
 };
 module.exports = mongoose.model("User", userSchema);
