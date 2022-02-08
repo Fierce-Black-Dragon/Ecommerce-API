@@ -32,5 +32,19 @@ app.use(
 app.use("/api/v1", home);
 app.use("/api/v1", user);
 
+//404(route not found) handler and pass to error handler
+app.use(async (req, res, next) => {
+  next(createError.NotFound());
+});
+//Error handler
+app.use((err, req, res, next) => {
+  res.status(err.status || 500);
+  res.send({
+    error: {
+      status: err.status || 500,
+      message: err.message,
+    },
+  });
+});
 // export app
 module.exports = app;
