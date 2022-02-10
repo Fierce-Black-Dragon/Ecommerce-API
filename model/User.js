@@ -36,6 +36,9 @@ const userSchema = new mongoose.Schema({
       required: true,
     },
   },
+  refreshToken: {
+    type: String,
+  },
   forgotPasswordToken: String,
   forgotTokenExpiry: Date,
   createdAt: {
@@ -61,10 +64,21 @@ userSchema.methods.isPasswordValid = async function (senderPassword) {
 };
 
 // jwt  creation
-userSchema.methods.jwtTokenCreation = async function () {
+userSchema.methods.jwtAccessTokenCreation = async function () {
   return await jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_EXPIRE,
   });
+};
+userSchema.methods.jwtRefreshTokenCreation = async function () {
+  const refreshToken = await jwt.sign(
+    { id: this._id },
+    process.env.JWT_SECRET_KEY,
+    {
+      expiresIn: process.env.JWT_EXPIRE,
+    }
+  );
+  this.refreshToken = refreshToken;
+  return refreshToken;
 };
 
 // forgot password token creation
@@ -73,7 +87,7 @@ userSchema.methods.getForgotPasswordToken = async function () {
   const forgotToken = await crypto.randomBytes(20).toString("hex"); // dont know how much time will  take
   //expire
   this.forgotPasswordExpiry = Date.now() + 20 * 60 * 1000;
- 
+
   // save hash version of the token in the database  and send the forgot password token  to user
   this.forgotPasswordToken = await crypto
     .createHash("sha256")

@@ -85,14 +85,14 @@ exports.Login = async (req, res, next) => {
   } catch (error) {
     if (error.isJoi === true) {
       error.status = 400;
-      // error.message = "email or password invalid";
+      error.message = "email or password invalid";
     }
     next(error);
   }
 };
 
 // log out user
-exports.logout = async (req, res) => {
+exports.logout = async (req, res, next) => {
   try {
     //making the cookie expiry  options
     const options = {
@@ -106,21 +106,22 @@ exports.logout = async (req, res) => {
       message: "logout success",
     });
   } catch (error) {
-    console.error(error);
+    next(error);
   }
 };
 //forgot password token
-exports.ForgotPassword = async (req, res) => {
+exports.ForgotPassword = async (req, res, next) => {
   try {
-    const { email } = req.body;
+    //checking if  email enter is actually a email
+    const validateResult = await forgotSchema.validateAsync(req.body);
+
+    const { email } = validateResult;
     //checking if email is send
-    if (!email) {
-      res.status(400).json({ message: "email required" });
-    }
+
     const user = await UserModel.findOne({ email });
     //checking if user with this email is register  in our database
     if (!user) {
-      res.status(404).send({ error: "user not found" });
+      throw createError.NotFound("User not found");
     }
     //creating forgot password token
     const forgotToken = await user.getForgotPasswordToken();
@@ -149,22 +150,24 @@ exports.ForgotPassword = async (req, res) => {
       user.forgotTokenExpiry = undefined;
       // saving in the database
       await user.save({ validateBeforeSave: false });
-      res.status(500).json({ errorMessage: error });
-      console.error(error);
+      console.log(error);
     }
   } catch (error) {
-    console.error(error);
+    if (error.isJoi === true) {
+      error.status = 422;
+      error.message = "  invalid   email";
+    }
+    next(error);
   }
 };
 
-exports.resetPassword = async (req, res) => {
+exports.resetPassword = async (req, res, next) => {
   try {
     const { user_id, forgotToken } = req.params;
+    const validateResult = await resetPasswordSchema.validateAsync(req.body);
 
-    const { password, confirmPassword } = req.body;
-    if (!(password && confirmPassword)) {
-      res.status(400).send("all feilds are required");
-    }
+    const { password, confirmPassword } = validateResult;
+
     const encryToken = crypto
       .createHash("sha256")
       .update(forgotToken)
@@ -177,12 +180,14 @@ exports.resetPassword = async (req, res) => {
     });
 
     if (!user) {
-      res.status(400).send("Token is invalid or expired");
+      throw createError.Unauthorized("Token is invalid or expired");
     }
 
     // check if password and conf password matched
     if (password !== confirmPassword) {
-      res.status(400).send("password and confirm password do not match");
+      throw createError.BadRequest(
+        "password and confirm password do not match"
+      );
     }
 
     // update password field in DB
@@ -199,6 +204,11 @@ exports.resetPassword = async (req, res) => {
 
     res.status(200).json({ message: " reset successfully" });
   } catch (error) {
-    console.error(error);
+    if (error.isJoi === true) {
+      error.status = 422;
+      error.message =
+        " all fields are required or invalid  fields values passed";
+    }
+    next(error);
   }
 };
