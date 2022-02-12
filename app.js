@@ -4,6 +4,7 @@ const express = require("express");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
 var morgan = require("morgan");
+const cookieParser = require("cookie-parser");
 const app = express();
 const home = require("./routes/home");
 const user = require("./routes/user");
@@ -24,6 +25,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //regular middleware
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   fileUpload({

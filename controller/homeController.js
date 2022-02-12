@@ -1,6 +1,10 @@
 exports.home = (req, res) => {
-  res.status(200).json({
-    Success: true,
-    message: "Welcome to  ecomm api ",
-  });
+  try {
+    res.status(200).json({
+      Success: true,
+      message: "Welcome to  ecomm api ",
+    });
+  } catch (e) {
+    console.log(e);
+  }
 };

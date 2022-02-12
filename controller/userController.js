@@ -104,11 +104,12 @@ exports.logout = async (req, res, next) => {
     };
 
     //setting cookie to null when logout route is requested
-    res.status(200).cookie("auth_token", null, options).json({
+    res.status(200).cookie("token", null, options).json({
       success: true,
       message: "logout success",
     });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };

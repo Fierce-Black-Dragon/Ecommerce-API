@@ -7,7 +7,7 @@ const cookieToken = async (user, res) => {
   const options = {
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     httpOnly: true,
-    Secure: true,
+    // Secure: true,
   };
   //refreshToken
   const refreshToken = await user.jwtRefreshTokenCreation();
@@ -19,7 +19,8 @@ const cookieToken = async (user, res) => {
   //
   user.password = undefined;
   //cookie creations
-  res.status(200).cookie("refreshToken", refreshToken, options).json({
+  res.cookie("token", refreshToken, options);
+  res.status(200).json({
     success: true,
     access_token: accessToken,
     name: user.name,
