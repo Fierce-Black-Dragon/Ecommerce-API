@@ -61,23 +61,18 @@ userSchema.methods.isPasswordValid = async function (senderPassword) {
   return await bcrypt.compare(senderPassword, this.password);
 };
 
-// jwt  creation
+// jwt Access Token  creation
 userSchema.methods.jwtAccessTokenCreation = async function () {
-  return await jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRE,
+  return await jwt.sign({ id: this._id }, process.env.JWT_ACCESS_KEY, {
+    expiresIn: process.env.JWT_ACCESS_EXPIRE,
   });
 };
-// userSchema.methods.jwtRefreshTokenCreation = async function () {
-//   const refreshToken = await jwt.sign(
-//     { id: this._id },
-//     process.env.JWT_SECRET_KEY,
-//     {
-//       expiresIn: process.env.JWT_EXPIRE,
-//     }
-//   );
-//   this.refreshToken = refreshToken;
-//   return refreshToken;
-// };
+// jwt tRefresh Token  creation
+userSchema.methods.jwtRefreshTokenCreation = async function () {
+  return await jwt.sign({ id: this._id }, process.env.JWT_REFRESH_KEY, {
+    expiresIn: process.env.JWT_REFRESH_EXPIRE,
+  });
+};
 
 // // forgot password token creation
 userSchema.methods.getForgotPasswordToken = async function () {

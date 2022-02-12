@@ -17,7 +17,7 @@ exports.signup = async (req, res, next) => {
     //validate the  user input (checking if all fields are enter correctly)
     const validateResult = await authRSchema.validateAsync(req.body);
     const { name, email, password, role } = validateResult;
-
+    console.log(`validateResult: ${validateResult}`);
     // checking if file is send
     if (!req.files) {
       throw createError.NotFound(" profileImage is missing");
@@ -35,7 +35,9 @@ exports.signup = async (req, res, next) => {
     //finding if user is already register
     const existingUser = await UserModel.findOne({ email: email });
     if (existingUser) {
-      throw createError.Conflict(`${result.email} is already been registered`);
+      throw createError.Conflict(
+        `${existingUser.email} is already been registered`
+      );
     }
     //creating user in mongo db
     const user = await UserModel.create({
@@ -53,6 +55,7 @@ exports.signup = async (req, res, next) => {
       message: "Register successfully u can login now",
     });
   } catch (error) {
+    console.log(error.message);
     if (error.isJoi === true) {
       error.status = 422;
       error.message =

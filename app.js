@@ -8,6 +8,9 @@ const app = express();
 const home = require("./routes/home");
 const user = require("./routes/user");
 
+//redis connection
+require("./config/redisDB");
+
 //cors middleware
 app.use(cors());
 
