@@ -10,6 +10,7 @@ const {
   resetPasswordSchema,
   forgotSchema,
 } = require("../utils/schemaValidator");
+const { verifyRefreshToken } = require("../utils/refreshTokenHelper");
 exports.signup = async (req, res, next) => {
   try {
     //
@@ -213,6 +214,19 @@ exports.resetPassword = async (req, res, next) => {
       error.message =
         " all fields are required or invalid  fields values passed";
     }
+    next(error);
+  }
+};
+
+exports.refreshTokenRenewal = async (req, res, next) => {
+  try {
+    const token = req.cookie.token;
+    if (!token) throw createError.BadRequest();
+    const userId = await verifyRefreshToken(token);
+    const user = await UserModel.findById(userId);
+    cookieToken(user, res);
+  } catch (error) {
+    console.log(error);
     next(error);
   }
 };
