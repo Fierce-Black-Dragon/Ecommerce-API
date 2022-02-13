@@ -101,20 +101,28 @@ exports.Login = async (req, res, next) => {
 exports.logout = async (req, res, next) => {
   try {
     //deleting refresh token from redisDB
-    const token = req.cookie.token;
-    res.send(token);
-
+    const token = req.cookies.token;
     //making the cookie expiry  options
-    // const options = {
-    //   expires: new Date(Date.now()),
-    //   httpOnly: true,
-    // };
+    const options = {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+    };
 
-    // //setting cookie to null when logout route is requested
-    // res.status(200).cookie("token", null, options).json({
-    //   success: true,
-    //   message: "logout success",
-    // });
+    const result = await JWT.verify(token, process.env.JWT_REFRESH_KEY);
+    const userId = result.id;
+    client.DEL(userId, (err, val) => {
+      if (err) {
+        console.log(err.message);
+        throw createError.InternalServerError();
+      }
+      console.log(val);
+    });
+
+    //setting cookie to null when logout route is requested
+    res.status(200).cookie("token", null, options).json({
+      success: true,
+      message: "logout success",
+    });
   } catch (error) {
     console.log(error);
     next(error);
@@ -229,12 +237,10 @@ exports.refreshTokenRenewal = async (req, res, next) => {
     const token = req.cookies?.token;
     if (!token) throw createError.BadRequest();
     const result = await JWT.verify(token, process.env.JWT_REFRESH_KEY);
-    console.log(result);
 
     const userId = result.id;
     const redisResult = await client.GET(userId);
 
-    console.log(redisResult);
     if (token !== redisResult) {
       throw createError.Unauthorized();
     }
@@ -245,3 +251,10 @@ exports.refreshTokenRenewal = async (req, res, next) => {
     next(error);
   }
 };
+
+// exports.userDashboard = async (req, res, next) => {
+//   const user = req?.user
+//   if (!user) {
+//      throw  createError
+//    }
+// }
