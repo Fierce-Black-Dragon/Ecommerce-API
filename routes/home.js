@@ -3,7 +3,7 @@ const router = express.Router();
 const { home } = require("../controller/homeController");
 const { isLoggedIn } = require("../middleware/authVerify");
 //all home routes
-router.route("/").get(isLoggedIn, home);
+router.route("/").get(home);
 
 //exports home routes
 module.exports = router;

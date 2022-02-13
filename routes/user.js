@@ -17,7 +17,7 @@ router.route("/login").post(Login);
 router.route("/logout").get(logout);
 router.route("/Forgot").post(ForgotPassword);
 router.route("/:user_id/password/reset/:forgotToken").post(resetPassword);
-router.route("/refreshToken").get(refreshTokenRenewal);
+router.route("/refreshToken").post(refreshTokenRenewal);
 //export router
 
 module.exports = router;

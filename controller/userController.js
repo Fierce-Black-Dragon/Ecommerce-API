@@ -3,14 +3,16 @@ const cookieToken = require("../utils/CookieToken");
 const cloudinary = require("cloudinary").v2;
 const mailHelper = require("../utils/NodeMailer");
 const crypto = require("crypto");
+const JWT = require("jsonwebtoken");
 const createError = require("http-errors");
+const client = require("../config/redisDB");
 const {
   authLSchema,
   authRSchema,
   resetPasswordSchema,
   forgotSchema,
 } = require("../utils/schemaValidator");
-const { verifyRefreshToken } = require("../utils/refreshTokenHelper");
+
 exports.signup = async (req, res, next) => {
   try {
     //
@@ -98,17 +100,21 @@ exports.Login = async (req, res, next) => {
 // log out user
 exports.logout = async (req, res, next) => {
   try {
-    //making the cookie expiry  options
-    const options = {
-      expires: new Date(Date.now()),
-      httpOnly: true,
-    };
+    //deleting refresh token from redisDB
+    const token = req.cookie.token;
+    res.send(token);
 
-    //setting cookie to null when logout route is requested
-    res.status(200).cookie("token", null, options).json({
-      success: true,
-      message: "logout success",
-    });
+    //making the cookie expiry  options
+    // const options = {
+    //   expires: new Date(Date.now()),
+    //   httpOnly: true,
+    // };
+
+    // //setting cookie to null when logout route is requested
+    // res.status(200).cookie("token", null, options).json({
+    //   success: true,
+    //   message: "logout success",
+    // });
   } catch (error) {
     console.log(error);
     next(error);
@@ -220,9 +226,18 @@ exports.resetPassword = async (req, res, next) => {
 
 exports.refreshTokenRenewal = async (req, res, next) => {
   try {
-    const token = req.cookie.token;
+    const token = req.cookies?.token;
     if (!token) throw createError.BadRequest();
-    const userId = await verifyRefreshToken(token);
+    const result = await JWT.verify(token, process.env.JWT_REFRESH_KEY);
+    console.log(result);
+
+    const userId = result.id;
+    const redisResult = await client.GET(userId);
+
+    console.log(redisResult);
+    if (token !== redisResult) {
+      throw createError.Unauthorized();
+    }
     const user = await UserModel.findById(userId);
     cookieToken(user, res);
   } catch (error) {
