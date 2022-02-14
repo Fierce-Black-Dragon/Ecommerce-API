@@ -107,9 +107,11 @@ exports.logout = async (req, res, next) => {
       expires: new Date(Date.now()),
       httpOnly: true,
     };
-
+    //verify token   to get user id
     const result = await JWT.verify(token, process.env.JWT_REFRESH_KEY);
+    //storing  user.id
     const userId = result.id;
+    //
     client.DEL(userId, (err, val) => {
       if (err) {
         console.log(err.message);
@@ -234,17 +236,23 @@ exports.resetPassword = async (req, res, next) => {
 
 exports.refreshTokenRenewal = async (req, res, next) => {
   try {
+    //getting refresh token from req cookie
     const token = req.cookies?.token;
+    //if cookie is null
     if (!token) throw createError.BadRequest();
+    //verify refresh token
     const result = await JWT.verify(token, process.env.JWT_REFRESH_KEY);
-
+    //storing use id from result
     const userId = result.id;
+    //fetching key from redis
     const redisResult = await client.GET(userId);
-
+    // checking  if req.cookie.token is same as token from redis db
     if (token !== redisResult) {
       throw createError.Unauthorized();
     }
+    //if its same then find the user in db
     const user = await UserModel.findById(userId);
+    // creating new refresh tokenand access token
     cookieToken(user, res);
   } catch (error) {
     console.log(error);
@@ -252,9 +260,10 @@ exports.refreshTokenRenewal = async (req, res, next) => {
   }
 };
 
-// exports.userDashboard = async (req, res, next) => {
-//   const user = req?.user
-//   if (!user) {
-//      throw  createError
-//    }
-// }
+exports.userDashboard = async (req, res, next) => {
+  const user = req?.user;
+  if (!user) {
+    throw createError.Unauthorized;
+  }
+  res.json(user);
+};
