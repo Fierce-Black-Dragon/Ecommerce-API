@@ -10,16 +10,18 @@ const {
   resetPassword,
   refreshTokenRenewal,
   userDashboard,
+  updatePassword,
 } = require("../controller/userController");
 
 //user routes
 router.route("/signup").post(signup);
 router.route("/login").post(Login);
 router.route("/logout").get(logout);
-router.route("/Forgot").post(ForgotPassword);
+router.route("/forgot").post(ForgotPassword);
 router.route("/:user_id/password/reset/:forgotToken").post(resetPassword);
 router.route("/refreshToken").post(refreshTokenRenewal);
-router.route("/user/dashboard").get(isLoggedIn, userDashboard);
+router.route("/userDashboard").get(isLoggedIn, userDashboard);
+router.route("/userDashboard/update/password").post(isLoggedIn, updatePassword);
 //export router
 
 module.exports = router;

@@ -111,7 +111,8 @@ exports.logout = async (req, res, next) => {
     const result = await JWT.verify(token, process.env.JWT_REFRESH_KEY);
     //storing  user.id
     const userId = result.id;
-    //
+    //deleting refresh token from redis db
+
     client.DEL(userId, (err, val) => {
       if (err) {
         console.log(err.message);
@@ -261,9 +262,58 @@ exports.refreshTokenRenewal = async (req, res, next) => {
 };
 
 exports.userDashboard = async (req, res, next) => {
-  const user = req?.user;
-  if (!user) {
-    throw createError.Unauthorized;
+  try {
+    //req.user is injected through middleware
+    const user = req?.user;
+    // if user is missing
+    if (!user) {
+      throw createError.Unauthorized;
+    }
+    //if user
+    res.json(user);
+  } catch (error) {
+    next(error);
   }
-  res.json(user);
+};
+
+exports.updatePassword = async (req, res, next) => {
+  try {
+    const userId = req?.user?._id;
+    const { oldPassword, newPassword, confirmNewPassword } = req.body;
+
+    if (!userId) {
+      throw createError.Unauthorized();
+    }
+    if (!(oldPassword && newPassword && confirmNewPassword)) {
+      throw createError.BadRequest();
+    }
+
+    const user = await UserModel.findById(userId).select("+password");
+    if (!user) throw createError.NotFound();
+
+    const isPAsswordCorrect = await user.isPasswordValid(oldPassword);
+    if (!isPAsswordCorrect) {
+      throw createError.Unauthorized("password invalid");
+    }
+    if (newPassword !== confirmNewPassword) {
+      throw createError.BadRequest(
+        "password and confirm password does not match"
+      );
+    }
+    // checking is old and new password are same
+    if (oldPassword === newPassword) {
+      throw createError.BadRequest(" new password cannot be same as old one  ");
+    }
+    // update password field in DB
+    user.password = newPassword;
+
+    // save the user
+    await user.save();
+
+    // send a JSON response
+
+    res.status(200).json({ message: " password update successfully" });
+  } catch (error) {
+    next(error);
+  }
 };
