@@ -317,3 +317,55 @@ exports.updatePassword = async (req, res, next) => {
     next(error);
   }
 };
+exports.updateProfile = async (req, res, next) => {
+  try {
+    const userId = req?.user?._id;
+
+    if (!userId) {
+      throw createError.Unauthorized();
+    }
+
+    // collect data from body
+    const newData = {
+      name: req.body.name,
+      email: req.body.email,
+    };
+
+    // if photo comes to us
+    if (req.files) {
+      const user = await UserModel.findById(req.user._id);
+
+      const imageId = user.profilePhoto.id;
+
+      // delete photo on cloudinary
+      const resp = await cloudinary.uploader.destroy(imageId);
+
+      // upload the new photo
+      const result = await cloudinary.uploader.upload(
+        req.files.profile.tempFilePath,
+        {
+          folder: "users",
+          width: 150,
+          crop: "scale",
+        }
+      );
+
+      // add photo data in newData object
+      newData.profilePhoto = {
+        id: result.public_id,
+        secured_Url: result.secure_url,
+      };
+    }
+
+    // update the data in user
+    const user = await UserModel.findByIdAndUpdate(req.user.id, newData, {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    });
+
+    res.send("successful");
+  } catch (error) {
+    next(error);
+  }
+};
