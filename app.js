@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const home = require("./routes/home");
 const user = require("./routes/user");
+const product = require("./routes/product");
 const createError = require("http-errors");
 //redis connection
 require("./config/redisDB");
@@ -36,6 +37,7 @@ app.use(
 //router middleware
 app.use("/api/v1", home);
 app.use("/api/v1", user);
+app.use("/api/v1", product);
 
 //404(route not found) handler and pass to error handler
 app.use(async (req, res, next) => {
