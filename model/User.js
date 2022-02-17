@@ -26,6 +26,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "user",
   },
+  // verified: {
+  //   type: Boolean,
+  //   default: false,
+  // },
+  // verificationToken: String,
+  // verificationTokenExpiry: Date,
   profilePhoto: {
     id: {
       type: String,
@@ -74,6 +80,20 @@ userSchema.methods.jwtRefreshTokenCreation = async function () {
   });
 };
 
+// //Verification token creation
+// userSchema.methods.getVerificationToken = async function () {
+//   //Verification token token creation -(type - String)
+//   const verificationToken = await crypto.randomBytes(20).toString("hex");
+//   this.verificationTokenExpiry = Date.now() + 20 * 60 * 1000;
+
+//   // save hash version of the token in the database  and send the Verification token token  to user
+//   this.verificationToken = await crypto
+//     .createHash("sha256")
+//     .update(forgotToken)
+//     .digest("hex");
+
+//   return verificationToken;
+// };
 // // forgot password token creation
 userSchema.methods.getForgotPasswordToken = async function () {
   //forgot password token creation -(type - String)
