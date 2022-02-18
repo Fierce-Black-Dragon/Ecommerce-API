@@ -24,6 +24,9 @@ router.route("/refreshToken").post(refreshTokenRenewal);
 router.route("/userDashboard").get(isLoggedIn, userDashboard);
 router.route("/userDashboard/update/password").post(isLoggedIn, updatePassword);
 router.route("/userDashboard/update/profile").post(isLoggedIn, updateProfile);
+// TODO: Add  admin routes in admin can update delete or and user of any role
+// TODO: add manager router where he can keep a check on seller and products
+
 //export router
 
 module.exports = router;
