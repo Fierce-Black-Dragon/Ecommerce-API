@@ -67,7 +67,7 @@ const productSchema = new mongoose.Schema(
     },
     brand: {
       type: String,
-      required: [true, "please add a brand for clothing"],
+      required: [true, "please add a brand "],
     },
     ratings: {
       type: Number,
