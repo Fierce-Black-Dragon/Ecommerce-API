@@ -1,16 +1,5 @@
 const mongoose = require("mongoose");
 
-// price
-// description
-// photos[]
-// category
-// Brand
-// stock
-// numberOFreviews
-// rating
-// reviews[user,name, rating,comment]
-// user(productCReator (ref))
-
 //review schema
 const reviewSchema = new mongoose.Schema(
   {
@@ -67,16 +56,9 @@ const productSchema = new mongoose.Schema(
       },
     ],
     category: {
-      type: String,
-      required: [
-        true,
-        "please select category from- short-sleeves, long-sleeves, sweat-shirts, hoodies",
-      ],
-      enum: {
-        values: ["shortsleeves", "longsleeves", "sweatshirt", "hoodies"],
-        message:
-          "please select category ONLY from - short-sleeves, long-sleeves, sweat-shirts and hoodies ",
-      },
+      type: mongoose.Schema.ObjectId,
+      ref: "Category",
+      required: true,
     },
     //this field was updated in order videos later
     stock: {
