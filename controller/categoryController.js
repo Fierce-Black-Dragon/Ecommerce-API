@@ -15,7 +15,6 @@ exports.createCategory = async (req, res, next) => {
       categoryDetails: categoryR,
     });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
