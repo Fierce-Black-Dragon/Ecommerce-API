@@ -25,4 +25,20 @@ class WhereClause {
     this.base = this.base.find({ ...searchElement });
     return this;
   }
+
+  //pagination
+  pager(resultPerPage) {
+    //initial page is 1
+    let currentPageNo = 1;
+    // checking  page no exist in query
+    if (this.bigQuery.page) {
+      //update current page with query page
+      currentPageNo = this.bigQuery.page;
+    }
+    // formula to skip values per page
+    const skipValue = resultPerPage * (currentPageNo - 1);
+    //updating base
+    this.base = this.base.limit(resultPerPage).skip(skipValue);
+    return this;
+  }
 }
