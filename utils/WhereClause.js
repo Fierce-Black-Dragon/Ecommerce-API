@@ -11,7 +11,7 @@ class WhereClause {
     this.bigQuery = bigQuery;
   }
 
-  //search
+  //search  func
   search() {
     // destructing req.query(bigQuery)
     const searchElement = this.bigQuery.search
@@ -25,8 +25,26 @@ class WhereClause {
     this.base = this.base.find({ ...searchElement });
     return this;
   }
+  //filter func
+  filter() {
+    const copyQ = { ...this.bigQ };
+    // deleting search, limit and page
+    delete copyQ["search"];
+    delete copyQ["limit"];
+    delete copyQ["page"];
 
-  //pagination
+    //convert copyQ (bigQ )into a string
+    let stringOfCopyQ = JSON.stringify(copyQ);
+    //replacing gte and lte to $gte and $ lte
+    stringOfCopyQ = stringOfCopyQ.replace(/\b(gte|lte)\b/g, (m) => `$${m}`);
+    //  converting  stringOfCopyQ to json object
+    const jsonOfCopyQ = JSON.parse(stringOfCopyQ);
+    // passing jsonCopyQ to base.find
+    this.base = this.base.find(jsonOfCopyQ);
+    return this;
+  }
+
+  //pagination  func
   pager(resultPerPage) {
     //initial page is 1
     let currentPageNo = 1;
