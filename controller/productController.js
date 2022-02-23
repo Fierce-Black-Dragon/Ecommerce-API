@@ -2,6 +2,7 @@ const cloudinary = require("cloudinary").v2;
 const Product = require("../model/Product");
 const createError = require("http-errors");
 const Category = require("../model/Category");
+const WhereClause = require("../utils/WhereClause");
 
 //create product
 exports.createProduct = async (req, res, next) => {
@@ -61,4 +62,28 @@ exports.createProduct = async (req, res, next) => {
     console.log(error);
     next(error);
   }
+};
+
+exports.getAllProduct = async (req, res, next) => {
+  const resultPerPage = 6;
+  const totalCountProduct = await Product.countDocuments();
+
+  const productsObj = new WhereClause(Product.find(), req.query)
+    .search()
+    .filter();
+
+  let products = await productsObj.base;
+  const filteredProductNumber = products.length;
+
+  //products.limit().skip()
+
+  productsObj.pager(resultPerPage);
+  products = await productsObj.base.clone();
+
+  res.status(200).json({
+    success: true,
+    products,
+    filteredProductNumber,
+    totalCountProduct,
+  });
 };
