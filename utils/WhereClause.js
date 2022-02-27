@@ -27,7 +27,7 @@ class WhereClause {
       $caseSensitive: false,
       $diacriticSensitive: false,
     });
-    console.log(this.base);
+    // console.log(this.base);
     return this;
   }
   //filter func
