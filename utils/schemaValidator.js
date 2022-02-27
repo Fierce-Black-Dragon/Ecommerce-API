@@ -22,7 +22,7 @@ const resetPasswordSchema = Joi.object({
 const productValidationSchema = Joi.object({
   name: Joi.string().alphanum().min(5).max(120).required(),
   price: Joi.number().integer().required(),
-  stock: JoiJoi.number().integer().required(),
+  stock: Joi.number().integer().required(),
   description: Joi.string().required(),
   category: Joi.string().required(),
   brand: Joi.string().required(),

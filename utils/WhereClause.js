@@ -3,7 +3,7 @@
 // product.find({})
 /// bigQuery stand for req.query
 // bigQuery ex
-// http://localhost:4001/api/v1/product?search=hplaptops&page=3&category=laptops&rating[gte]=4&limit=10
+// http://localhost:4001/api/v1/product?search=ddderrr&page=3&category=62120a1a60f62967c20504f2&rating[gte]=4&limit=10
 
 class WhereClause {
   constructor(base, bigQuery) {
@@ -18,11 +18,16 @@ class WhereClause {
       ? {
           name: {
             $regex: this.bigQuery.search,
-            options: "i",
           },
         }
       : {};
-    this.base = this.base.find({ ...searchElement });
+
+    this.base = this.base.find({
+      ...searchElement,
+      $caseSensitive: false,
+      $diacriticSensitive: false,
+    });
+    console.log(this.base);
     return this;
   }
   //filter func
