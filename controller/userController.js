@@ -369,3 +369,18 @@ exports.updateProfile = async (req, res, next) => {
     next(error);
   }
 };
+
+// admin controllers
+exports.adminGetAllUsers = async (req, res, next) => {
+  const users = await UserModel.find({ role: "user" });
+  const sellers = await UserModel.find({ role: "seller" });
+  const managers = await UserModel.find({ role: "manager" });
+
+  res.status(200).json({
+    success: true,
+    message: "  users with roles managers,sellers and user are listed below",
+    users,
+    sellers,
+    managers,
+  });
+};
