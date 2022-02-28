@@ -421,3 +421,19 @@ exports.adminPromoteOrDe_PromoteAUser = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.adminDeleteAUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    await UserModel.findByIdAndDelete(id).then((result) => {
+      res.status(200).json({
+        deleted: true,
+        success: true,
+        message: `user with id : ${id} has been removed or deleted from our db`,
+      });
+    });
+  } catch (error) {
+    next(error);
+  }
+};
