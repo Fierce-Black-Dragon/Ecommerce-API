@@ -14,6 +14,7 @@ const {
   updatePassword,
   updateProfile,
   adminGetAUser,
+  adminPromoteOrDe_PromoteAUser,
 } = require("../controller/userController");
 
 const { admin, manager, seller, user } = require("../config/roles");
@@ -37,7 +38,9 @@ router
 router
   .route("/admin/allUsers/:id")
   .get(isLoggedIn, customRoleChecker(admin), adminGetAUser);
-
+router
+  .route("/admin/allUsers/:id")
+  .post(isLoggedIn, customRoleChecker(admin), adminPromoteOrDe_PromoteAUser);
 //export router
 
 module.exports = router;

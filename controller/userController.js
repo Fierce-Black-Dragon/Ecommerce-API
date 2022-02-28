@@ -402,3 +402,22 @@ exports.adminGetAUser = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.adminPromoteOrDe_PromoteAUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
+    if (!role) {
+      throw createError.Conflict(
+        `cant promote or de-promote user to undefine role`
+      );
+    }
+    const update = await UserModel.findByIdAndUpdate({ role: role });
+    res.status(201).json({
+      success: true,
+      message: `user role changed to ${user.role}`,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
