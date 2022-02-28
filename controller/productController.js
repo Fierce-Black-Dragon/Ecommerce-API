@@ -65,25 +65,29 @@ exports.createProduct = async (req, res, next) => {
 };
 
 exports.getAllProduct = async (req, res, next) => {
-  const resultPerPage = 6;
-  const totalCountProduct = await Product.countDocuments();
+  try {
+    const resultPerPage = 6;
+    const totalCountProduct = await Product.countDocuments();
 
-  const productsObj = new WhereClause(Product.find(), req.query)
-    .search()
-    .filter();
+    const productsObj = new WhereClause(Product.find(), req.query)
+      .search()
+      .filter();
 
-  let products = await productsObj.base;
-  const filteredProductNumber = products.length;
+    let products = await productsObj.base;
+    const filteredProductNumber = products.length;
 
-  //products.limit().skip()
+    //products.limit().skip()
 
-  productsObj.pager(resultPerPage);
-  products = await productsObj.base.clone();
+    productsObj.pager(resultPerPage);
+    products = await productsObj.base.clone();
 
-  res.status(200).json({
-    success: true,
-    products,
-    filteredProductNumber,
-    totalCountProduct,
-  });
+    res.status(200).json({
+      success: true,
+      products,
+      filteredProductNumber,
+      totalCountProduct,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
