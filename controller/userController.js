@@ -372,15 +372,33 @@ exports.updateProfile = async (req, res, next) => {
 
 // admin controllers
 exports.adminGetAllUsers = async (req, res, next) => {
-  const users = await UserModel.find({ role: "user" });
-  const sellers = await UserModel.find({ role: "seller" });
-  const managers = await UserModel.find({ role: "manager" });
+  try {
+    const users = await UserModel.find({ role: "user" });
+    const sellers = await UserModel.find({ role: "seller" });
+    const managers = await UserModel.find({ role: "manager" });
 
-  res.status(200).json({
-    success: true,
-    message: "  users with roles managers,sellers and user are listed below",
-    users,
-    sellers,
-    managers,
-  });
+    res.status(200).json({
+      success: true,
+      message: "  users with roles managers,sellers and user are listed below",
+      users,
+      sellers,
+      managers,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.adminGetAUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = await UserModel.findById(id);
+    res.status(200).json({
+      success: true,
+      message: ` The details of user ${user?.name} are as follows`,
+      details: user,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
