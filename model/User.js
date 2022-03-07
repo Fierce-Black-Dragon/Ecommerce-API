@@ -42,7 +42,14 @@ const userSchema = new mongoose.Schema({
       required: true,
     },
   },
-
+  sellerDetails: {
+    name: String,
+    logo: String,
+    description: String,
+    shippingPrice: { type: Number, default: 0, required: true },
+    rating: { type: Number, default: 0, required: true },
+    numReviews: { type: Number, default: 0, required: true },
+  },
   forgotPasswordToken: String,
   forgotTokenExpiry: Date,
   createdAt: {

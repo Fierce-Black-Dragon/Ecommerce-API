@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   createProduct,
   getAllProduct,
+  getSellerProducts,
   fetchAProductById,
 } = require("../controller/productController");
 const { admin, manager, seller, user } = require("../config/roles");
@@ -19,5 +20,12 @@ router.route("/products/:id").get(fetchAProductById);
 router
   .route("/createProduct")
   .post(isLoggedIn, customRoleChecker(admin, manager, seller), createProduct);
+router
+  .route("/seller/Products")
+  .get(
+    isLoggedIn,
+    customRoleChecker(admin, manager, seller),
+    getSellerProducts
+  );
 //exports home routes
 module.exports = router;

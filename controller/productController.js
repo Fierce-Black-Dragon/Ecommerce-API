@@ -105,3 +105,20 @@ exports.fetchAProductById = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getSellerProducts = async (req, res, next) => {
+  try {
+    const id = req.user._id;
+    const products = await Product.find({ user: id });
+    if (!products) {
+      throw createError.NotFound(" product cant be found");
+    }
+    res.status(200).json({
+      success: true.valueOf,
+      products,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
