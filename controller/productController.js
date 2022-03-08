@@ -149,6 +149,12 @@ exports.sellerUpdateProductByID = async (req, res, next) => {
         return true;
       }
     });
+
+    if (!isFound) {
+      throw createError.Unauthorized(
+        "ur not authorized to change this product"
+      );
+    }
     let imagesArray = [];
 
     if (req.files) {
@@ -176,14 +182,51 @@ exports.sellerUpdateProductByID = async (req, res, next) => {
 
     req.body.photos = imagesArray;
 
-    product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+    product = await Product.findByIdAndUpdate(id, req.body, {
       new: true,
       runValidators: true,
       useFindAndModify: false,
     });
-    res.json({
-      sellerProduct,
-      isFound,
+    res.status(200).json({
+      success: true,
+      product,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+exports.sellerDeleteProductByID = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const sellerId = req.user._id;
+    const sellerProduct = req.user.sellerProducts;
+
+    const isFound = sellerProduct.some((element) => {
+      if (element.toString() === id) {
+        return true;
+      }
+    });
+
+    if (!isFound) {
+      throw createError.Unauthorized(
+        "ur not authorized to change this product"
+      );
+    }
+
+    //destroy the existing image
+    for (let index = 0; index < product.photos.length; index++) {
+      const res = await cloudinary.v2.uploader.destroy(
+        product.photos[index].id
+      );
+    }
+
+    await product.remove();
+
+    res.status(200).json({
+      success: true,
+      message: "Product was deleted !",
     });
   } catch (error) {
     console.log(error);
