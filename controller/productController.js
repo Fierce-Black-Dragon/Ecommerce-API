@@ -3,12 +3,13 @@ const Product = require("../model/Product");
 const createError = require("http-errors");
 const Category = require("../model/Category");
 const WhereClause = require("../utils/WhereClause");
-
+const UserModel = require("../model/User");
 //create product
 exports.createProduct = async (req, res, next) => {
   try {
     // getting the require data from req.body
     const { name, price, description, category, stock, brand } = req.body;
+    const userId = req.user._id;
 
     //if any fields are missing
     if (!(name && price && description && category && stock && brand)) {
@@ -54,6 +55,15 @@ exports.createProduct = async (req, res, next) => {
       user: req.user._id,
     });
 
+    const saveProductId = await UserModel.updateOne(
+      { _id: userId },
+      {
+        $push: {
+          sellerProducts: product._id,
+        },
+      }
+    );
+    console.log(saveProductId);
     res.status(200).json({
       success: true,
       product,
