@@ -5,6 +5,7 @@ const {
   getAllProduct,
   getSellerProducts,
   fetchAProductById,
+  sellerUpdateProductByID,
 } = require("../controller/productController");
 const { admin, manager, seller, user } = require("../config/roles");
 const { isLoggedIn, customRoleChecker } = require("../middleware/authVerify");
@@ -27,5 +28,13 @@ router
     customRoleChecker(admin, manager, seller),
     getSellerProducts
   );
+router
+  .route("/seller/Products/:id")
+  .put(
+    isLoggedIn,
+    customRoleChecker(admin, manager, seller),
+    sellerUpdateProductByID
+  );
+
 //exports home routes
 module.exports = router;

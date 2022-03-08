@@ -132,3 +132,61 @@ exports.getSellerProducts = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.sellerUpdateProductByID = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const sellerId = req.user._id;
+    const sellerProduct = req.user.sellerProducts;
+    const { name, price, description, category, stock, brand } = req.body;
+
+    //if any fields are missing
+    if (!(name && price && description && category && stock && brand)) {
+      throw createError.BadRequest("all fields  are required");
+    }
+    const isFound = sellerProduct.some((element) => {
+      if (element.toString() === id) {
+        return true;
+      }
+    });
+    let imagesArray = [];
+
+    if (req.files) {
+      //destroy the existing image
+      for (let index = 0; index < product.photos.length; index++) {
+        const res = await cloudinary.v2.uploader.destroy(
+          product.photos[index].id
+        );
+      }
+
+      for (let index = 0; index < req.files.photos.length; index++) {
+        let result = await cloudinary.v2.uploader.upload(
+          req.files.photos[index].tempFilePath,
+          {
+            folder: "products", //folder name -> .env
+          }
+        );
+
+        imagesArray.push({
+          id: result.public_id,
+          secure_url: result.secure_url,
+        });
+      }
+    }
+
+    req.body.photos = imagesArray;
+
+    product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    });
+    res.json({
+      sellerProduct,
+      isFound,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
