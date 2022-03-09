@@ -233,3 +233,46 @@ exports.sellerDeleteProductByID = async (req, res, next) => {
     next(error);
   }
 };
+exports.addReview = BigPromise(async (req, res, next) => {
+  const { rating, comment } = req.body;
+  const { id } = req.params;
+  const review = {
+    user: req.user._id,
+    name: req.user.name,
+    rating: Number(rating),
+    comment,
+  };
+
+  const product = await Product.findById(id);
+
+  const AlreadyReview = product.reviews.find(
+    (rev) => rev.user.toString() === req.user._id.toString()
+  );
+
+  if (AlreadyReview) {
+    product.reviews.forEach((review) => {
+      if (review.user.toString() === req.user._id.toString()) {
+        review.comment = comment;
+        review.rating = rating;
+      }
+    });
+  } else {
+    product.reviews.push(review);
+    product.numberOfReviews = product.reviews.length;
+  }
+
+  // adjust ratings
+
+  product.ratings =
+    product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+    product.reviews.length;
+
+  //save
+
+  await product.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    success: true,
+    product,
+  });
+});
