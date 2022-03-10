@@ -8,6 +8,7 @@ const {
   sellerUpdateProductByID,
   sellerDeleteProductByID,
   addReview,
+  deleteReview,
 } = require("../controller/productController");
 const { admin, manager, seller, user } = require("../config/roles");
 const { isLoggedIn, customRoleChecker } = require("../middleware/authVerify");
@@ -16,7 +17,10 @@ const { isLoggedIn, customRoleChecker } = require("../middleware/authVerify");
 // fetch all product or fetch search product route
 router.route("/products").get(getAllProduct);
 router.route("/products/:id").get(fetchAProductById);
-router.route("/products/:id/review").post(isLoggedIn, addReview);
+router
+  .route("/products/:id/review")
+  .put(isLoggedIn, addReview)
+  .delete(isLoggedIn, deleteReview);
 
 ////Admin
 
