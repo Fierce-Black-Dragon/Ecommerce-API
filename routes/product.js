@@ -48,5 +48,5 @@ router
     sellerDeleteProductByID
   );
 
-//exports home routes
+//exports  routes
 module.exports = router;

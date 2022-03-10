@@ -118,6 +118,7 @@ exports.fetchAProductById = async (req, res, next) => {
 
 exports.addReview = async (req, res, next) => {
   try {
+    //TODO: check if user is verified buyer of this product
     const { rating, comment } = req.body;
     const { id } = req.params;
     const review = {
