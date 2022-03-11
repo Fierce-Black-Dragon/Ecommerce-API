@@ -27,3 +27,16 @@ exports.createShippingAddress = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getLoggedINUserAddress = async (req, res) => {
+  try {
+    const user = req.user._id;
+
+    const UserAddress = await ShippingAddress.find({ user: user });
+    res.status(200).json({
+      MyAddress: UserAddress,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
