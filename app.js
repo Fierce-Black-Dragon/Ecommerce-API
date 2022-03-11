@@ -6,12 +6,16 @@ const cors = require("cors");
 var morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const app = express();
+const createError = require("http-errors");
+
+//routes
 const home = require("./routes/home");
 const user = require("./routes/user");
 const product = require("./routes/product");
 const category = require("./routes/category");
 const payment = require("./routes/payment");
-const createError = require("http-errors");
+const shippingAddress = require("./routes/shippingAddress");
+
 //redis connection
 require("./config/redisDB");
 
@@ -42,6 +46,8 @@ app.use("/api/v1", user);
 app.use("/api/v1", product);
 app.use("/api/v1", category);
 app.use("/api/v1", payment);
+app.use("/api/v1", shippingAddress);
+
 //404(route not found) handler and pass to error handler
 app.use(async (req, res, next) => {
   next(createError.NotFound());
