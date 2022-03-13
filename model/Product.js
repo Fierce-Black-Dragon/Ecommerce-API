@@ -60,6 +60,11 @@ const productSchema = new mongoose.Schema(
       ref: "Category",
       required: true,
     },
+    ShippingPrice: {
+      type: Number,
+      default: 0,
+      required: true,
+    },
     //this field was updated in order videos later
     stock: {
       type: Number,

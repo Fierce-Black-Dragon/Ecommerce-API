@@ -28,7 +28,7 @@ exports.createShippingAddress = async (req, res, next) => {
   }
 };
 
-export const getLoggedInUserAddress = async (req, res) => {
+exports.getLoggedInUserAddress = async (req, res) => {
   try {
     const user = req.user._id;
 

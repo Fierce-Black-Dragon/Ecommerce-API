@@ -8,11 +8,8 @@ const shippingAddressSchema = new mongoose.Schema({
   postalCode: { type: String },
   country: { type: String },
   contact_no: { type: Number },
-  lat: Number,
-  lng: Number,
 });
-const shippingAddressM = mongoose.model(
-  "shippingAddress",
+module.exports = module.exports = mongoose.model(
+  "ShippingAddress",
   shippingAddressSchema
 );
-export default shippingAddressM;
