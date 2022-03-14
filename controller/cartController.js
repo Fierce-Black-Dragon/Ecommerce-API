@@ -46,8 +46,7 @@ exports.addCartItems = async (req, res, next) => {
         return el.productID.toString() === id.toString();
       });
       const newQty = alreadyCartItem?.qty + 1;
-      //calculating  total price
-      productToAdd.totalPrice = productToAdd.price * newQty;
+
       //if the product exist in cart items ..
       if (alreadyCartItem) {
         await Cart.updateOne(
@@ -55,6 +54,7 @@ exports.addCartItems = async (req, res, next) => {
           {
             $set: {
               "cartItems.$.qty": newQty,
+              //calculating  total price
               "cartItems.$.totalPrice": productToAdd.price * newQty,
             },
           }
@@ -65,7 +65,7 @@ exports.addCartItems = async (req, res, next) => {
           });
         });
       }
-      //if it doesnt
+      //if it doesn't
       else if (!alreadyCartItem) {
         await Cart.updateOne(
           { user: user },
@@ -82,6 +82,57 @@ exports.addCartItems = async (req, res, next) => {
         });
       }
     }
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+export const removeCartItem = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const user = req.user._id;
+
+    const cart = await Cart.find({ user: user }, { cartItems: 1 });
+
+    const cartItem = cart[0]?.cartItems.find((el) => {
+      return el.productID.toString() === id.toString();
+    });
+
+    //if the product qty   is more than ..
+    if (cartItem && cartItem?.qty > 1) {
+      const newQty = cartItem?.qty - 1;
+      await Cart.updateOne(
+        { user: user, "cartItems.productID": id },
+        {
+          $set: {
+            "cartItems.$.qty": newQty,
+            //calculating  total price
+            "cartItems.$.totalPrice": cartItem.totalPrice - cartItem.price,
+          },
+        }
+      ).then((result) => {
+        res.status(201).json({
+          success: true,
+          message: "product removed  from cart",
+        });
+      });
+    }
+
+    var filtered = cartItems.filter(function (el) {
+      return el.productID == id;
+    });
+
+    const idToRemove = filtered[0]?._id;
+
+    await Cart.updateOne(
+      { user: user },
+      { $pull: { cartItems: { _id: idToRemove } } },
+      { new: true }
+    ).then((result) => {
+      res.status(201).json({ message: "  You have removed" });
+    });
   } catch (error) {
     console.log(error);
     next(error);
