@@ -46,12 +46,15 @@ exports.addCartItems = async (req, res, next) => {
         return el.productID.toString() === id.toString();
       });
       const newQty = alreadyCartItem?.qty + 1;
+      const newShippingPrice =
+        existingCart[0].ShippingPrice + foundProduct.ShippingPrice;
 
       //if the product exist in cart items ..
       if (alreadyCartItem) {
         await Cart.updateOne(
           { user: user, "cartItems.productID": id },
           {
+            ShippingPrice: newShippingPrice,
             $set: {
               "cartItems.$.qty": newQty,
               //calculating  total price
@@ -67,9 +70,12 @@ exports.addCartItems = async (req, res, next) => {
       }
       //if it doesn't
       else if (!alreadyCartItem) {
+        const newShippingPrice =
+          existingCart[0].ShippingPrice + foundProduct.ShippingPrice;
         await Cart.updateOne(
           { user: user },
           {
+            ShippingPrice: newShippingPrice,
             $push: {
               cartItems: productToAdd,
             },
@@ -88,6 +94,7 @@ exports.addCartItems = async (req, res, next) => {
   }
 };
 
+//TODO:  CAN DELETE CART IF USER HAS NO ITEMS IN CART
 exports.removeCartItems = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -95,7 +102,8 @@ exports.removeCartItems = async (req, res, next) => {
     const user = req.user._id;
 
     const cart = await Cart.find({ user: user }, { cartItems: 1 });
-
+    const foundProduct = await Product.findById(id);
+    const newShippingPrice = cart[0].ShippingPrice - foundProduct.ShippingPrice;
     const cartItem = cart[0]?.cartItems.find((el) => {
       return el.productID.toString() === id.toString();
     });
@@ -105,9 +113,11 @@ exports.removeCartItems = async (req, res, next) => {
     //if the product qty   is more than ..
     if (cartItem && cartItem?.qty > 1) {
       const newQty = cartItem?.qty - 1;
+
       await Cart.updateOne(
         { user: user, "cartItems.productID": id },
         {
+          ShippingPrice: newShippingPrice,
           $set: {
             "cartItems.$.qty": newQty,
             //calculating  total price
@@ -125,10 +135,43 @@ exports.removeCartItems = async (req, res, next) => {
 
       await Cart.updateOne(
         { user: user },
-        { $pull: { cartItems: { _id: idToRemove } } },
+        {
+          $pull: { cartItems: { _id: idToRemove } },
+        },
         { new: true }
       ).then((result) => {
         res.status(201).json({ message: "  You have removed" });
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+exports.loggedInUSerCart = async (req, res, next) => {
+  try {
+    const user = req.user._id;
+    const cart = await Cart.find({ user: user });
+    if (cart[0]?.cartItems.length === 0) {
+      throw createError.NotFound(" product not be found");
+    } else {
+      const cartItemsTotalPrices = cart[0]?.cartItems.map((p) => p.totalPrice);
+      const totalPrice = cartItemsTotalPrices?.reduce((a, b) => a + b, 0);
+
+      const grandtotalPrice = cart.ShippingPrice + totalPrice;
+      console.log(cart, totalPrice);
+      // await Cart.updateOne(
+      //   { user: user },
+      //   {
+      //     $set: {
+      //       grandtotalPrice: grandtotalPrice,
+      //     },
+      //   }
+      // );
+
+      await Cart.find({ user: user }).then((result) => {
+        res.status(201).json(result);
       });
     }
   } catch (error) {

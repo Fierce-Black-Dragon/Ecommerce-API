@@ -24,5 +24,6 @@ const cartSchema = new mongoose.Schema({
     },
   ],
   ShippingPrice: { type: Number, default: 0, required: true },
+  grandtotalPrice: { type: Number, default: 0, required: true },
 });
 module.exports = mongoose.model("Cart", cartSchema);
