@@ -101,9 +101,10 @@ exports.removeCartItems = async (req, res, next) => {
 
     const user = req.user._id;
 
-    const cart = await Cart.find({ user: user }, { cartItems: 1 });
+    const cart = await Cart.find({ user: user });
     const foundProduct = await Product.findById(id);
     const newShippingPrice = cart[0].ShippingPrice - foundProduct.ShippingPrice;
+    console.log(newShippingPrice);
     const cartItem = cart[0]?.cartItems.find((el) => {
       return el.productID.toString() === id.toString();
     });
@@ -159,16 +160,16 @@ exports.loggedInUSerCart = async (req, res, next) => {
       const cartItemsTotalPrices = cart[0]?.cartItems.map((p) => p.totalPrice);
       const totalPrice = cartItemsTotalPrices?.reduce((a, b) => a + b, 0);
 
-      const grandtotalPrice = cart.ShippingPrice + totalPrice;
-      console.log(cart, totalPrice);
-      // await Cart.updateOne(
-      //   { user: user },
-      //   {
-      //     $set: {
-      //       grandtotalPrice: grandtotalPrice,
-      //     },
-      //   }
-      // );
+      const grandtotalPrice = cart[0].ShippingPrice + totalPrice;
+      // console.log(cart);
+      await Cart.updateOne(
+        { user: user },
+        {
+          $set: {
+            grandtotalPrice: grandtotalPrice,
+          },
+        }
+      );
 
       await Cart.find({ user: user }).then((result) => {
         res.status(201).json(result);
