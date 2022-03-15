@@ -88,7 +88,7 @@ exports.addCartItems = async (req, res, next) => {
   }
 };
 
-export const removeCartItem = async (req, res, next) => {
+exports.removeCartItems = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -99,7 +99,9 @@ export const removeCartItem = async (req, res, next) => {
     const cartItem = cart[0]?.cartItems.find((el) => {
       return el.productID.toString() === id.toString();
     });
-
+    if (!cartItem) {
+      throw createError.BadRequest();
+    }
     //if the product qty   is more than ..
     if (cartItem && cartItem?.qty > 1) {
       const newQty = cartItem?.qty - 1;
@@ -118,21 +120,17 @@ export const removeCartItem = async (req, res, next) => {
           message: "product removed  from cart",
         });
       });
+    } else {
+      const idToRemove = cartItem._id;
+
+      await Cart.updateOne(
+        { user: user },
+        { $pull: { cartItems: { _id: idToRemove } } },
+        { new: true }
+      ).then((result) => {
+        res.status(201).json({ message: "  You have removed" });
+      });
     }
-
-    var filtered = cartItems.filter(function (el) {
-      return el.productID == id;
-    });
-
-    const idToRemove = filtered[0]?._id;
-
-    await Cart.updateOne(
-      { user: user },
-      { $pull: { cartItems: { _id: idToRemove } } },
-      { new: true }
-    ).then((result) => {
-      res.status(201).json({ message: "  You have removed" });
-    });
   } catch (error) {
     console.log(error);
     next(error);
