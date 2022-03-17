@@ -9,7 +9,4 @@ const shippingAddressSchema = new mongoose.Schema({
   country: { type: String },
   contact_no: { type: Number },
 });
-module.exports = module.exports = mongoose.model(
-  "ShippingAddress",
-  shippingAddressSchema
-);
+module.exports = mongoose.model("ShippingAddress", shippingAddressSchema);
