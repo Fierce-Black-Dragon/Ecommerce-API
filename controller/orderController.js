@@ -68,22 +68,32 @@ exports.placeOrder = async (req, res, next) => {
       try {
         await mailHelper({
           email: req.user.email,
-          subject: ``,
+          subject: `order with id #${result._id} i=has been successfully placed`,
           message: message,
         });
-        res.status(200).json({
-          success: true,
-          message: "Email sent successfully",
-        });
       } catch (error) {
-        //if  sending email failed  resetting the token to null
-        user.forgotPasswordToken = undefined;
-        user.forgotTokenExpiry = undefined;
-        // saving in the database
-        await user.save({ validateBeforeSave: false });
         console.log(error);
+        next(error);
       }
       res.json({ message: "order is placed and cart is empty now." });
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+exports.getLoggedInUserOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.find({ user: req.user._id });
+
+    if (!orders) {
+      throw createError.NotFound(" No orders ");
+    }
+
+    res.status(200).json({
+      success: true,
+      orders,
     });
   } catch (error) {
     console.log(error);
