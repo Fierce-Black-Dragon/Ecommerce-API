@@ -67,10 +67,7 @@ const orderSchema = new mongoose.Schema({
       type: String,
     },
   },
-  taxAmount: {
-    type: Number,
-    required: true,
-  },
+
   shippingAmount: {
     type: Number,
     required: true,

@@ -155,7 +155,7 @@ exports.loggedInUSerCart = async (req, res, next) => {
     const user = req.user._id;
     const cart = await Cart.find({ user: user });
     if (cart[0]?.cartItems.length === 0) {
-      throw createError.NotFound(" product not be found");
+      throw createError.NotFound(" cart is empty...");
     } else {
       const cartItemsTotalPrices = cart[0]?.cartItems.map((p) => p.totalPrice);
       const totalPrice = cartItemsTotalPrices?.reduce((a, b) => a + b, 0);
