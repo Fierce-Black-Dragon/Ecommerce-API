@@ -14,9 +14,17 @@ exports.addCartItems = async (req, res, next) => {
     }
 
     const foundProduct = await Product.findById(id);
-
+    //check if   the product is out of stock
+    if (foundProduct.stock === 0) {
+      throw createError.BadRequest(`out of Stock`);
+    }
+    if (parseInt(req.body?.Qty) > foundProduct.stock) {
+      throw createError.BadRequest(
+        `only ${foundProduct.stock} unit of this product  are remaining`
+      );
+    }
     const totalPrice = foundProduct.price * defaultQty;
-    //product
+    //product to add
 
     let productToAdd = {
       productID: foundProduct._id,
@@ -45,6 +53,7 @@ exports.addCartItems = async (req, res, next) => {
     }
     // if user has  products added to cart
     else {
+      //check if product  exist in user cart if yess add qty of the product
       const alreadyCartItem = existingCart[0]?.cartItems.find((el) => {
         return el.productID.toString() === id.toString();
       });
@@ -54,12 +63,10 @@ exports.addCartItems = async (req, res, next) => {
       } else {
         newQty = alreadyCartItem?.qty + 1;
       }
-      console.log(newQty);
+
       const newShippingPrice =
         existingCart[0].ShippingPrice + foundProduct.ShippingPrice;
-      if (newQty > foundProduct.stock) {
-        throw createError.BadRequest();
-      }
+
       if (alreadyCartItem) {
         //if the product exist in cart items ..
         await Cart.updateOne(
@@ -100,7 +107,6 @@ exports.addCartItems = async (req, res, next) => {
       }
     }
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -115,7 +121,7 @@ exports.removeCartItems = async (req, res, next) => {
     const cart = await Cart.find({ user: user });
     const foundProduct = await Product.findById(id);
     const newShippingPrice = cart[0].ShippingPrice - foundProduct.ShippingPrice;
-    console.log(newShippingPrice);
+
     const cartItem = cart[0]?.cartItems.find((el) => {
       return el.productID.toString() === id.toString();
     });
@@ -124,7 +130,15 @@ exports.removeCartItems = async (req, res, next) => {
     }
     //if the product qty   is more than ..
     if (cartItem && cartItem?.qty > 1) {
-      const newQty = cartItem?.qty - 1;
+      let newQty;
+      if (parseInt(req.body?.Qty) > cartItem?.qty) {
+        throw createError.BadRequest();
+      }
+      if (req.body?.Qty) {
+        newQty = cartItem?.qty - parseInt(req.body?.Qty);
+      } else {
+        newQty = cartItem?.qty - 1;
+      }
 
       await Cart.updateOne(
         { user: user, "cartItems.productID": id },
@@ -156,7 +170,6 @@ exports.removeCartItems = async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -187,7 +200,6 @@ exports.loggedInUSerCart = async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };

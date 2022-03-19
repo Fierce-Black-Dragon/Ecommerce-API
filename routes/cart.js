@@ -7,6 +7,6 @@ const {
 } = require("../controller/cartController");
 const { isLoggedIn, customRoleChecker } = require("../middleware/authVerify");
 router.route("/addToCart/product/:id").post(isLoggedIn, addCartItems);
-router.route("/remove/product/:id").get(isLoggedIn, removeCartItems);
+router.route("/remove/product/:id").post(isLoggedIn, removeCartItems);
 router.route("/myCart").get(isLoggedIn, loggedInUSerCart);
 module.exports = router;
