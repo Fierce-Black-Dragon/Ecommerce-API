@@ -10,7 +10,7 @@ const {
   addReview,
   deleteReview,
 } = require("../controller/productController");
-const { admin, manager, seller, user } = require("../config/roles");
+
 const { isLoggedIn, customRoleChecker } = require("../middleware/authVerify");
 //all  routes
 
@@ -27,24 +27,44 @@ router
 // product creation route
 router
   .route("/createProduct")
-  .post(isLoggedIn, customRoleChecker(admin, manager, seller), createProduct);
+  .post(
+    isLoggedIn,
+    customRoleChecker(
+      process.env.ADMIN,
+      process.env.MANAGER,
+      process.env.SELLER
+    ),
+    createProduct
+  );
 router
   .route("/seller/Products")
   .get(
     isLoggedIn,
-    customRoleChecker(admin, manager, seller),
+    customRoleChecker(
+      process.env.ADMIN,
+      process.env.MANAGER,
+      process.env.SELLER
+    ),
     getSellerProducts
   );
 router
   .route("/seller/Products/:id")
   .put(
     isLoggedIn,
-    customRoleChecker(admin, manager, seller),
+    customRoleChecker(
+      process.env.ADMIN,
+      process.env.MANAGER,
+      process.env.SELLER
+    ),
     sellerUpdateProductByID
   )
   .delete(
     isLoggedIn,
-    customRoleChecker(admin, manager, seller),
+    customRoleChecker(
+      process.env.ADMIN,
+      process.env.MANAGER,
+      process.env.SELLER
+    ),
     sellerDeleteProductByID
   );
 

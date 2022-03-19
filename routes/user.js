@@ -35,16 +35,20 @@ router.route("/userDashboard/update/profile").post(isLoggedIn, updateProfile);
 //admin routes
 router
   .route("/admin/allUsers")
-  .get(isLoggedIn, customRoleChecker(admin), adminGetAllUsers);
+  .get(isLoggedIn, customRoleChecker(process.env.ADMIN), adminGetAllUsers);
 router
   .route("/admin/allUsers/:id")
-  .get(isLoggedIn, customRoleChecker(admin), adminGetAUser);
+  .get(isLoggedIn, customRoleChecker(process.env.ADMIN), adminGetAUser);
 router
   .route("/admin/allUsers/:id")
-  .post(isLoggedIn, customRoleChecker(admin), adminPromoteOrDe_PromoteAUser);
+  .post(
+    isLoggedIn,
+    customRoleChecker(process.env.ADMIN),
+    adminPromoteOrDe_PromoteAUser
+  );
 router
   .route("/admin/allUsers/:id")
-  .delete(isLoggedIn, customRoleChecker(admin), adminDeleteAUser);
+  .delete(isLoggedIn, customRoleChecker(process.env.ADMIN), adminDeleteAUser);
 //export router
 
 module.exports = router;

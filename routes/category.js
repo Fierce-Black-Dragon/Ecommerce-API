@@ -6,7 +6,11 @@ const { admin, manager, seller, user } = require("../config/roles");
 //all category  routes
 router
   .route("/createC")
-  .post(isLoggedIn, customRoleChecker(admin, manager), createCategory);
+  .post(
+    isLoggedIn,
+    customRoleChecker(process.env.ADMIN, process.env.MANAGER),
+    createCategory
+  );
 //TODO: get categories route
 
 //exports home routes
