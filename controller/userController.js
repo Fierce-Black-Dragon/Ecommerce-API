@@ -47,6 +47,7 @@ exports.signup = async (req, res, next) => {
       name,
       email,
       password,
+      role: role || "user",
       profilePhoto: {
         id: responseImage.public_id,
         secured_Url: responseImage.secure_url,
