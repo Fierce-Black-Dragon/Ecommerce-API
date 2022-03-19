@@ -2,26 +2,25 @@ const ShippingAddress = require("../model/ShippingAddress");
 const createError = require("http-errors");
 exports.createShippingAddress = async (req, res, next) => {
   try {
-    const { fullName, addressLine, city, postalCode, country, contact_no } =
+    const { fullName, address, city, postalCode, country, phoneNo, state } =
       req.body;
-    if (
-      !(fullName && addressLine && city && postalCode && country && contact_no)
-    ) {
+    if (!(fullName && address && city && postalCode && country && phoneNo)) {
       throw createError.BadRequest(" all felids required");
     }
-    const address = await ShippingAddress.create({
+    const Createdaddress = await ShippingAddress.create({
       user: req.user._id,
       fullName,
-      addressLine,
+      address,
       city,
       postalCode,
       country,
-      contact_no,
+      phoneNo,
+      state,
     });
     res.status(201).json({
       success: true,
       message: "ShippingAddress added successfully",
-      ShippingAddress: address,
+      ShippingAddress: Createdaddress,
     });
   } catch (error) {
     next(error);

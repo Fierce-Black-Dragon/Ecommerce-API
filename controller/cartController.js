@@ -6,20 +6,23 @@ exports.addCartItems = async (req, res, next) => {
   try {
     const { id } = req.params;
     const defaultQty = req.body.Qty || 1;
+
     const user = req.user._id;
     const existingCart = await Cart.find({ user: user }); //find() returns a list
     if (!id) {
       throw createError.NotFound(" product not be found");
     }
+
     const foundProduct = await Product.findById(id);
 
     const totalPrice = foundProduct.price * defaultQty;
     //product
+
     let productToAdd = {
       productID: foundProduct._id,
       name: foundProduct.name,
       seller: foundProduct.user,
-      image: foundProduct.photos[0].secure_url,
+      image: foundProduct.photos[0]?.secure_url,
       price: foundProduct.price,
       qty: defaultQty,
       totalPrice: totalPrice,
@@ -45,12 +48,20 @@ exports.addCartItems = async (req, res, next) => {
       const alreadyCartItem = existingCart[0]?.cartItems.find((el) => {
         return el.productID.toString() === id.toString();
       });
-      const newQty = alreadyCartItem?.qty + 1;
+      let newQty;
+      if (req.body?.Qty) {
+        newQty = alreadyCartItem?.qty + parseInt(req.body?.Qty);
+      } else {
+        newQty = alreadyCartItem?.qty + 1;
+      }
+      console.log(newQty);
       const newShippingPrice =
         existingCart[0].ShippingPrice + foundProduct.ShippingPrice;
-
-      //if the product exist in cart items ..
+      if (newQty > foundProduct.stock) {
+        throw createError.BadRequest();
+      }
       if (alreadyCartItem) {
+        //if the product exist in cart items ..
         await Cart.updateOne(
           { user: user, "cartItems.productID": id },
           {

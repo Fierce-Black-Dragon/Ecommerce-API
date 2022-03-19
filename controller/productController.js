@@ -230,12 +230,9 @@ exports.sellerUpdateProductByID = async (req, res, next) => {
     const { id } = req.params;
     const sellerId = req.user._id;
     const sellerProduct = req.user.sellerProducts;
-    const { name, price, description, category, stock, brand } = req.body;
 
     //if any fields are missing
-    if (!(name && price && description && category && stock && brand)) {
-      throw createError.BadRequest("all fields  are required");
-    }
+
     const isFound = sellerProduct.some((element) => {
       if (element.toString() === id) {
         return true;
@@ -246,6 +243,11 @@ exports.sellerUpdateProductByID = async (req, res, next) => {
       throw createError.Unauthorized(
         "ur not authorized to change this product"
       );
+    }
+    let product = await Product.findById(id);
+
+    if (!product) {
+      return next(new CustomError("No product found with this id", 401));
     }
     let imagesArray = [];
 
@@ -274,11 +276,12 @@ exports.sellerUpdateProductByID = async (req, res, next) => {
 
     req.body.photos = imagesArray;
 
-    product = await Product.findByIdAndUpdate(id, req.body, {
+    product = await Product.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
       useFindAndModify: false,
     });
+
     res.status(200).json({
       success: true,
       product,
