@@ -33,6 +33,7 @@ router.route("/userDashboard/update/profile").post(isLoggedIn, updateProfile);
 // TODO: add manager router where he can keep a check on seller and products
 
 //admin routes
+
 router
   .route("/admin/allUsers")
   .get(isLoggedIn, customRoleChecker(process.env.ADMIN), adminGetAllUsers);
