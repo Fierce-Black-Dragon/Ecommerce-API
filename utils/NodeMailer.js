@@ -15,6 +15,7 @@ const mailHelper = async (option) => {
     to: option.email, // list of receivers
     subject: option.subject, // Subject line
     text: option.message, // plain text body
+    // amp: option.amp, // html body
   };
 
   // send mail with defined transport object
