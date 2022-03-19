@@ -126,3 +126,51 @@ exports.getLoggedInSellerOrderList = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.adminGetAllOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.find();
+
+    res.status(200).json({
+      success: true,
+      orders,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.adminUpdateOrder = async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (order.orderStatus === "Delivered") {
+      throw createError.BadRequest("Order is already marked for delivered");
+    }
+
+    order.orderStatus = req.body.orderStatus;
+
+    await order.save();
+
+    res.status(200).json({
+      success: true,
+      order,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.adminDeleteOrder = async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    await order.remove();
+
+    res.status(200).json({
+      success: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
