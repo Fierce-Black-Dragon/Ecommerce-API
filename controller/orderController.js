@@ -143,7 +143,7 @@ exports.adminGetAllOrders = async (req, res, next) => {
 exports.adminUpdateOrder = async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id);
-
+    const customer = order.user;
     if (order.orderStatus === "Delivered") {
       throw createError.BadRequest("Order is already marked for delivered");
     }

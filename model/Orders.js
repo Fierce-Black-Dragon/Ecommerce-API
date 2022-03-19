@@ -56,8 +56,21 @@ const orderSchema = new mongoose.Schema({
     },
   ],
   paymentInfo: {
-    id: {
+    success: {
+      type: Boolean,
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    client_secret: {
       type: String,
+      required: true,
+    },
+    paymentId: {
+      type: String,
+      required: true,
     },
   },
 

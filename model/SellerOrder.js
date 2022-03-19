@@ -14,8 +14,7 @@ const sellerOrderSchema = new mongoose.Schema(
     price: { type: Number, required: true },
     qty: { type: Number, required: true },
     cancelled: { type: Boolean, default: false },
-    isDelivered: { type: Boolean, default: false },
-    deliveredAt: { type: Date },
+    isShipped: { type: Boolean, default: false },
   },
   {
     timestamp: true,
