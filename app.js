@@ -16,6 +16,7 @@ const category = require("./routes/category");
 const payment = require("./routes/payment");
 const shippingAddress = require("./routes/shippingAddress");
 const cart = require("./routes/cart");
+const order = require("./routes/order");
 //redis connection
 require("./config/redisDB");
 
@@ -48,6 +49,7 @@ app.use("/api/v1", category);
 app.use("/api/v1", payment);
 app.use("/api/v1", shippingAddress);
 app.use("/api/v1", cart);
+app.use("/api/v1", order);
 //404(route not found) handler and pass to error handler
 app.use(async (req, res, next) => {
   next(createError.NotFound());

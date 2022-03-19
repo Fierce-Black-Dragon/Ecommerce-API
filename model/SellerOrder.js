@@ -10,7 +10,7 @@ const sellerOrderSchema = new mongoose.Schema(
     },
     name: { type: String, required: true },
     seller: { type: mongoose.Schema.Types.ObjectID, ref: "User" },
-    image: { type: String, required: true },
+
     price: { type: Number, required: true },
     qty: { type: Number, required: true },
     cancelled: { type: Boolean, default: false },
